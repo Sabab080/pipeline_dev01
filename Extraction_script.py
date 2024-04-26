@@ -4,7 +4,6 @@ from datetime import datetime, timedelta
 import pandas as pd
 from sqlalchemy import create_engine, text
 from airflow import DAG
-#from airflow.operators.python_operator import PythonOperator
 from airflow.utils.dates import days_ago
 from airflow.operators.python import PythonOperator
 
@@ -73,7 +72,8 @@ with DAG(
     'etl_daily_sales',
     default_args=default_args,
     description='Transfer data from source MySQL database to target MySQL database',
-    schedule_interval='@daily',  # Run every hour
+    #schedule_interval='@daily',  # Run every hour
+    schedule_interval='0 */5 * * *' , # Cron expression to execute for every 5 hours
     start_date=datetime(2024, 4, 18),
     tags=['mysql', 'data_transfer'],
 ) as dag:
