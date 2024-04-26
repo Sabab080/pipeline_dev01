@@ -33,22 +33,30 @@ extract_query = """
 
 # Define function to extract data from source MySQL database
 def extract_data():
-    logging.info("Extracting data from source MySQL database...")
-    source_connection_url = f"mysql+mysqlconnector://{source_user}:{source_password}@{source_host}/{source_schema}"
-    engine = create_engine(source_connection_url)
-    df = pd.read_sql(extract_query, engine)
-    logging.info("Data extraction completed.")
-    return df
+    try:
+        logging.info("Extracting data from source MySQL database...")
+        source_connection_url = f"mysql+mysqlconnector://{source_user}:{source_password}@{source_host}/{source_schema}"
+        engine = create_engine(source_connection_url)
+        df = pd.read_sql(extract_query, engine)
+        logging.info("Data extraction completed.")
+        return df
+    except Exception as e:
+        logging.error("Error extracting data from source MySQL database: %s", str(e))
+        raise
+
 
 # Define function to load data into target MySQL database
-def load_data(df,target_table_name):
-    logging.info("Loading data into target MySQL database...")
-    print("Dataframe...")
-    print(df)
-    target_connection_url = f"mysql+mysqlconnector://{target_user}:{target_password}@{target_host}/{target_schema}"
-    engine = create_engine(target_connection_url)
-    df.to_sql(target_table_name, engine, if_exists='append', schema=target_schema, index=False)
-    logging.info("Data loading completed.")
+def load_data(df, target_table_name):
+    try:
+        logging.info("Loading data into target MySQL database...")
+        target_connection_url = f"mysql+mysqlconnector://{target_user}:{target_password}@{target_host}/{target_schema}"
+        engine = create_engine(target_connection_url)
+        df.to_sql(target_table_name, engine, if_exists='append', schema=target_schema, index=False)
+        logging.info("Data loading completed.")
+    except Exception as e:
+        logging.error("Error loading data into target MySQL database: %s", str(e))
+        raise
+
 
 # Define default arguments for the DAG
 default_args = {
